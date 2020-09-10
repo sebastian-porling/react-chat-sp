@@ -1,0 +1,43 @@
+{
+  "name": "express-socket-chat",
+  "version": "1.0.0",
+  "description": "A chat server backend utilizing JWT tokens for auth and using sockets.",
+  "main": "index.js",
+  "bin": "bin.js",
+  "pkg": {
+    "assets": [
+      "./node_modules/figlet/fonts/Standard.flf",
+      "./dist/**/*",
+      "./*"
+    ]
+  },
+  "scripts": {
+    "start": "node bin.js",
+    "dev": "nodemon bin.js",
+    "build": "pkg . --out-path ../build"
+  },
+  "keywords": [
+    "express",
+    "socket.io",
+    "jwt"
+  ],
+  "author": "Sebsatian Porling",
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  },
+  "dependencies": {
+    "chalk": "^4.1.0",
+    "clear": "^0.1.0",
+    "connect-history-api-fallback": "^1.6.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "figlet": "^1.5.0",
+    "firebase-admin": "^9.1.1",
+    "internal-ip": "^6.1.0",
+    "morgan": "^1.10.0",
+    "pkg": "^4.4.9",
+    "socket.io": "^2.3.0"
+  }
+}
