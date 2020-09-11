@@ -8,16 +8,10 @@ const cluster = require("cluster"),
  * @param port Port to start server on, 3000 default
  */
 module.exports.main = (port = 3000) => {
-    if (cluster.isMaster) {
+    try {
         welcomeMessage.display(port);
-        for (let i = 0; i < numCPUs; i++) {
-            cluster.fork();
-        }
-    } else {
-        try {
-            server.start(port);
-        } catch (error) {
-            console.error("Couldn't start server, ", error);
-        }
+        server.start(port);
+    } catch (error) {
+        console.log("Couldn't start server: ", error);
     }
 };

@@ -11,47 +11,47 @@ module.exports = (client, clientManager, chatroomManager) => {
         const {picture, name} = client.decoded;
         entry = {message: entry, user: {name, picture}, time: Date.now()};
         chatroom.addEntry(entry);
-        chatroom.broadcastMessage({chatroom, ...entry})
+        chatroom.broadcastMessage({...entry})
     }
 
     const handleJoin = (chatroomName, cb) => {
         chatroomHandler(chatroomName)
-        .then(chatroom => {
-            handleEntry(chatroom, `joined ${chatroomName}`);
+        .then((chatroom) => {
             chatroom.addUser(client);
-            cb(null, chatroom.getChatHistory());
+            handleEntry(chatroom, `joined ${chatroomName}`);
+            return cb(null, chatroom.getChatHistory());
         })
-        .catch(cb)
+        .catch(err => client.emit('join', err))
     }
 
     const handleLeave = (chatroomName, cb) => {
         chatroomHandler(chatroomName)
         .then(chatroom => {
-            handleEntry(chatroom, `leaved ${chatroomName}`);
             chatroom.removeUser(client);
-            cb(null);
+            handleEntry(chatroom, `leaved ${chatroomName}`);
+            return cb(null);
         })
-        .catch(cb)
+        .catch(err => client.emit('leave', err))
     }
 
     const handleGetChatrooms = (cb) => {
         return cb(chatroomManager.getChatrooms());
     }
 
-    const handleMessage = ({chatroomName, message}, cb) => {
+    const handleMessage = ({chatroomName, message}) => {
         chatroomHandler(chatroomName)
         .then(chatroom => {
             handleEntry(chatroom, message);
             cb(null);
         })
-        .catch(cb);
+        .catch(err => client.emit('message', err));
     }
 
     const handleGetUsers = (cb) => {
         return cb(null, clientManager.getUsers());
     }
 
-    const handleDisconnect = () => {
+    const handleDisconnect =  () => {
         clientManager.removeClient(client);
         chatroomManager.removeClient(client);
     }
