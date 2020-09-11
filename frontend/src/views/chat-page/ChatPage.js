@@ -1,52 +1,124 @@
-import React, { useState, useContext} from 'react';
-import LogoutButton from '../LogoutButton';
-import RoomSwitcher from './RoomSwitcher';
-import UserSettings from './UserSettings';
-import ChatForm from './ChatForm';
-import Chat from './Chat';
-import {UserContext} from '../../providers/UserProvider'
-import {joinRoom, leaveRoom} from '../../services/socketService'
+import React, { useState, useContext, useEffect } from "react";
+
+import LogoutButton from "../LogoutButton";
+import RoomSwitcher from "./RoomSwitcher";
+import RoomUsers from "./RoomUsers";
+import UserColorSelector from "./UserColorSelector";
+import ChatForm from "./ChatForm";
+import Chat from "./Chat";
+
+import { UserContext } from "../../providers/UserProvider";
+import { joinRoom, leaveRoom } from "../../services/socketService";
+import AuthService from "../../services/authService";
 
 const ChatPage = () => {
-    const { socket} = useContext(UserContext);
-    const [room, setRoom] = useState('');
+    const { socket } = useContext(UserContext);
+    const [room, setRoom] = useState("");
+    const [users, setUsers] = useState([]);
     const [messages, setMessages] = useState([]);
-    const [userSettings, setUserSettings] = useState(null);
+    const [userColor, setUserColor] = useState("white");
 
-    const changeRoom = (newRoom) => {
-        if (room === '') {
-            joinRoom(newRoom, socket, async (err, messages) => {
+    /**
+     * Setup eventlisteners for messages and users.
+     * Get the current users chat color
+     * And setup the window to leave the room when quitting
+     */
+    useEffect(() => {
+        socket.on("message", (message) => {
+            updateMessages(message);
+        });
+        socket.on("users", (newUsers) => {
+            updateUsers(newUsers);
+        });
+        AuthService.getUserColor(({ color }) => {
+            setUserColor(color);
+        });
+        window.onbeforeunload = () => {
+            leaveRoom(room, socket, () => {});
+            socket.off();
+        };
+    }, []);
+
+    /**
+     * Change the room
+     * @param {String} newRoom chat room name
+     */
+    const changeRoom = async (newRoom) => {
+        if (room === "") {
+            handleJoinRoom(newRoom);
+        } else {
+            leaveRoom(room, socket, async (err) => {
                 if (err) console.log(err);
-                setMessages(messages);
-                setRoom(newRoom);
-            })
+                handleJoinRoom(newRoom);
+            });
         }
-        leaveRoom(room, socket, async  (err) => {
-            if (err !== null) console.log(err);
-            joinRoom(newRoom, socket, async (err, messages) => {
-                if (err !== null) console.log(err);
-                console.log(messages);
-                setMessages(messages);
-                setRoom(newRoom);
-            })
-        })
-    }
-    socket.on('message', async (message) => {
-        setMessages([...messages, message]);
-    })
-    const changeUserSettings = (newUserSettings) => {
-        setUserSettings(newUserSettings);
+    };
+
+    /**
+     * Join a new room and change the room state
+     * and messages for that room.
+     * @param {String} newRoom name of chat room
+     */
+    const handleJoinRoom = async (newRoom) => {
+        joinRoom(newRoom, socket, (err, chat) =>{
+            if (err) console.log(err);
+            setMessages(chat);
+            setRoom(newRoom);
+            return;
+        });
     }
 
+    /**
+     * Append messages to the message state
+     * @param {Array} message array of messages
+     */
+    const updateMessages = (message) => {
+        if (message.message) {
+            setMessages((messages) => [...messages, message]);
+        }
+    };
+
+    /**
+     * Updates the users state
+     * @param {Array} newUsers array of users
+     */
+    const updateUsers = (newUsers) => {
+        setUsers(newUsers);
+    };
+
+    /**
+     * Changes the color of the current user, in state and firebase
+     * @param {String} newUserColor color string from color.js
+     */
+    const changeUserColor = (newUserColor) => {
+        setUserColor(newUserColor);
+        AuthService.changeUserColor(newUserColor);
+    };
+
+    /**
+     * Render ChatPage
+     * Using RoomSwitcher for changing rooms,
+     * UserColorSelector for changing color,
+     * LogoutButton
+     * Chat for displaying messages
+     * RoomUsers for displaying logged in users in chat room
+     * ChatForm for sending messages
+     */
     return (
-        <div>
-            <RoomSwitcher room={room} changeRoom={changeRoom}/>
-            <LogoutButton/>
-            <UserSettings userSettings={userSettings} changeUserSettings={changeUserSettings}/>
-            <Chat room={room} messages={messages}/>
-            <ChatForm room={room} userSettings={userSettings}/>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+            <div style={{ maxWidth: "600px", width: "100%" }}>
+                <RoomSwitcher room={room} changeRoom={changeRoom} />
+                <UserColorSelector
+                    color={userColor}
+                    changeColor={changeUserColor}
+                />
+                <LogoutButton />
+                <RoomUsers users={users} />
+                <Chat room={room} messages={messages} />
+                <ChatForm room={room} userColor={userColor} />
+            </div>
         </div>
-    )
-}
+    );
+};
 
-export default ChatPage
+export default ChatPage;
