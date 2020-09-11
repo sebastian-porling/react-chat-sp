@@ -2,13 +2,38 @@
 
 This solution is made by [Sebastian Porling](https://github.org/sebastian-porling).
 
-### Frontend
+## :heavy_check_mark: Demo
+
+![Site Demo](./doc/site-demo.gif)
+
+## :boom: Compile, execute and build
+
+The project is available on [https://react-chat-sp.herokuapp.com/](https://react-chat-sp.herokuapp.com/). You will not be able to compile and execute this project on your computer as I use firebase, which is something toy have to setup in order to run this project.
+
+### :arrow_forward: Frontend
 
 I have been using react for the frontend utilizing material.ui for styling.
+I use firebase for the frontend to handle the login and getting the JWT token which is sent to the backend for authorization.
 
-more stuff...
+|class|functionality|
+|----|----|
+|colors|just static colors used in the application|
+|init-firebase|Initializes the firebase application|
+|UserProvider|Using the react context to provide user and socket states. Registers a listener on the user object using firebase|
+|authService|Have functions for signin and signout, also adds default color to firebase database|
+|socketService|Have functions for emitting to the server socket, as well setting up a client socket|
+|StartPage|Displays welcome message and login button|
+|LoginButton|Signs in using a google popup using firebase|
+|ChatPage|Displays the chat, chatform, color switcher, room switcher and room users|
+|Chat|Displays all messages|
+|ChatMessage|Displays a message and user info|
+|ChatForm|A form for submitting messages|
+|RoomSwitcher|Select for changing chat room|
+|RoomUsers|Displays all users in the chat room|
+|UserColorSelector|Select for changing message color|
+|LogoutButton|Signs out using firebase|
 
-### Backend
+### :arrow_backward: Backend
 
 I used Node.js, express and Socket.io for the backend.
 I create multiple handlers and take care of authentication before the conenction with the socket has been sstablished.
