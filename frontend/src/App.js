@@ -4,24 +4,32 @@ import { Terminal } from "react-window-ui";
 import StartPage from "./views/start-page/StartPage";
 import ChatPage from "./views/chat-page/ChatPage";
 import { UserContext } from "./providers/UserProvider";
-import useMediaQuery from '@material-ui/core/useMediaQuery';
-import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
-import "./App.css";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
+import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
 
 function App() {
-    const {user} = useContext(UserContext);
+    const { user } = useContext(UserContext);
+    const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
 
-    const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-
-    const theme = React.useMemo(() =>
+    /**
+     * Setup the material-ui theme
+     */
+    const theme = React.useMemo(
+        () =>
             createMuiTheme({
-            palette: {
-            type: prefersDarkMode ? 'dark' : 'light',
-            },
-        }),
-        [prefersDarkMode],
+                palette: {
+                    type: prefersDarkMode ? "dark" : "light",
+                },
+                typography: {
+                    fontFamily: 'hack'
+                }
+            }),
+        [prefersDarkMode]
     );
 
+    /**
+     * Render the app
+     */
     return (
         <div
             style={{
@@ -41,10 +49,11 @@ function App() {
                     maxWidth: "1200px",
                     width: "100%",
                     height: "96vh",
-                    fontFamily: "hack"
+                    fontFamily: "hack",
                 }}
-            ><ThemeProvider theme={theme}>
-                {user ? <ChatPage /> : <StartPage />}
+            >
+                <ThemeProvider theme={theme}>
+                    {user ? <ChatPage /> : <StartPage />}
                 </ThemeProvider>
             </Terminal>
         </div>
