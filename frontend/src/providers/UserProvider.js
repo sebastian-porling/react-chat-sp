@@ -4,12 +4,13 @@ import { initSocketIO } from "../services/socketService";
 import AuthService from "../services/authService";
 
 /**
- *
+ * Create a usercontext with the state of user and socket
  */
-export const UserContext = createContext({ user: null, users: [] });
+export const UserContext = createContext({ user: null, socket: null });
 
 /**
- *
+ * Provides the state of the user and socket
+ * Adds a listener on the user if the state changes and adds a socket
  */
 class UserProvider extends Component {
     state = {
