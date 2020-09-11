@@ -1,22 +1,21 @@
 const express = require('express');
 const app = express();
 const path = require('path');
-const history = require("connect-history-api-fallback");
-app.use(require("cors"));
+const cors = require('cors');
 const server = require('http').createServer(app);
-const {admin} = require('./integration/firebaseAdmin');
 require('dotenv').config();
 require('./model/socket')(server);
 
 const {CLIENT_URL} = process.env;
+app.use(cors());
 
 /**
  * Register static client
  */
-if (CLIENT_URL === '') {
-    app.use(express.static(path.join(__dirname, 'public')));
+if (!CLIENT_URL) {
+    app.use('/', express.static(path.join(__dirname,'public')));
 } else {
-    app.get('/', (req, res) => res.redirect(CLIENT_URL+'/'))
+    app.get('/', (_, res) => res.redirect(CLIENT_URL+'/'))
 }
 
 /**

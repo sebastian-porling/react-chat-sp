@@ -7,7 +7,7 @@
   "pkg": {
     "assets": [
       "./node_modules/figlet/fonts/Standard.flf",
-      "./dist/**/*",
+      "./public/**/*",
       "./*"
     ]
   },
@@ -29,7 +29,6 @@
   "dependencies": {
     "chalk": "^4.1.0",
     "clear": "^0.1.0",
-    "connect-history-api-fallback": "^1.6.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
